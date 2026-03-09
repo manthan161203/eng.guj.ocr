@@ -30,7 +30,12 @@ EXPOSE 8000
 
 ENV PYTHONUNBUFFERED=1
 ENV EASYOCR_MODULE_PATH=/root/.EasyOCR
+ENV PORT=8000
+ENV WHISPER_MODEL=base
+ENV WHISPER_DEVICE=cpu
+ENV WHISPER_COMPUTE_TYPE=int8
 
 RUN mkdir -p /root/.EasyOCR/model
 
-CMD ["uvicorn", "advanced_ocr_api:app", "--host", "0.0.0.0", "--port", "8000"]
+# Use PORT environment variable for Railway compatibility
+CMD uvicorn advanced_ocr_api:app --host 0.0.0.0 --port ${PORT:-8000}

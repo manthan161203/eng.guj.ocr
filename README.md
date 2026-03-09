@@ -227,13 +227,31 @@ python advanced_ocr_api.py
 ```
 Server runs on `http://localhost:8000`
 
-### Docker Compose
+### Docker Compose (Local)
 ```bash
 docker compose up --build
 ```
 Server runs on `http://localhost:8001` (as configured in docker-compose.yml)
 
-### Custom Port/Host (Local)
+### Railway (Recommended for Production)
+One-click deployment to [Railway.app](https://railway.app):
+
+1. Push code to GitHub
+2. Go to [railway.app](https://railway.app) and sign in
+3. Click "New Project" → "Deploy from GitHub"
+4. Select your repository
+5. Railway auto-detects and deploys! 🚀
+
+**Configuration:**
+- Railway automatically sets the `PORT` variable
+- First deployment takes 5-10 minutes (downloading ML models)
+- See [DEPLOYMENT_RAILWAY.md](DEPLOYMENT_RAILWAY.md) for detailed instructions
+
+**Costs:**
+- Free: $5/month credit (usually sufficient)
+- Paid: Pay-as-you-go pricing
+
+### Custom Port (Local)
 ```bash
 uvicorn advanced_ocr_api:app --host 0.0.0.0 --port 8080
 ```
