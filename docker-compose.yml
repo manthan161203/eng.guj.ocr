@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  ocr-api:
+    build: .
+    container_name: ocr-translation-api
+    ports:
+      - "8001:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - EASYOCR_MODULE_PATH=/root/.EasyOCR
+    volumes:
+      - easyocr-models:/root/.EasyOCR
+    restart: unless-stopped
+
+volumes:
+  easyocr-models:
+    driver: local
