@@ -1,315 +1,169 @@
-# OCR + Translation Web App
+# OCR Translation API (English/Gujarati)
 
-A powerful, full-featured web application for optical character recognition (OCR), multi-language translation, audio transcription, and text-to-speech conversion. Built with FastAPI and featuring a modern, responsive web interface.
+FastAPI application for:
+- Text translation
+- Image OCR + translation
+- Audio transcription (Speech-to-Text)
+- Text-to-Speech audio generation
+- Exporting translation results as PDF/TXT
 
-**Key Features:**
-- 🔍 **Multi-Engine OCR**: EasyOCR, PaddleOCR, and Tesseract support
-- 🌍 **Multi-Language**: English, Hindi, and Gujarati (easily extensible)
-- 📝 **Text Translation**: Real-time translation between supported languages
-- 🖼️ **Image OCR**: Extract and translate text from images
-- 🎤 **Speech-to-Text**: Audio transcription using Faster Whisper
-- 🔊 **Text-to-Speech**: Generate audio from translated text
-- 📥 **Export**: Save results as PDF or TXT files
-- 🎨 **Modern UI**: Responsive web interface with dark mode
-
----
-
-## Quick Start
-
-### Option 1: Docker (Recommended)
-
-```bash
-docker compose up --build
-```
-
-Then open:
-- **UI**: `http://localhost:8001`
-- **API Docs**: `http://localhost:8001/docs`
-- **API Info**: `http://localhost:8001/api-info`
-
-### Option 2: Local Python Installation
-
-```bash
-# Clone/navigate to project directory
-cd /path/to/project
-
-# Create virtual environment
-python3 -m venv .venv
-source .venv/bin/activate
-
-# Install dependencies
-pip install -r requirements_advanced_ocr.txt
-
-# Run the server
-python advanced_ocr_api.py
-```
-
-Then open `http://localhost:8000`
-
----
-
-## Architecture
-
-### Backend
-- **Framework**: FastAPI (Python)
-- **Server**: Uvicorn
-- **OCR Engines**: EasyOCR, PaddleOCR, Tesseract
-- **Translation**: GoogleTrans
-- **Speech Processing**: Faster Whisper, gTTS
-- **PDF Generation**: ReportLab
-- **Image Processing**: Pillow, OpenCV
-
-### Frontend
-- **Architecture**: Single-Page Application (SPA)
-- **HTML/CSS/JS**: Vanilla JavaScript with Tailwind CSS
-- **Features**: Multi-tab interface, real-time preview, progress tracking
-
----
-
-## API Documentation
-
-### Core Endpoints
-
-#### Health & Info
-- `GET /` - Serve frontend UI
-- `GET /api-info` - Get API capabilities and version
-- `GET /available-engines` - List available OCR engines and languages
-
-#### Text Operations
-- `POST /translate-text` - Translate plain text
-- `POST /translate` - Alternative translate endpoint
-
-#### Image Operations
-- `POST /translate-image` - OCR + translate image
-  - Supports: PNG, JPEG, GIF, BMP, WebP
-  - Returns: Extracted text, translation, confidence scores
-
-#### Audio Operations
-- `POST /transcribe-audio` - Convert audio to text (Speech-to-Text)
-  - Supports: MP3, WAV, M4A, AAC
-  - Returns: Transcribed text, detected language
-- `GET /audio/{audio_id}` - Retrieve generated audio file
-
-#### Export
-- `POST /export` - Generate PDF or TXT export
-  - Parameters: content, language, format (pdf/txt)
-  - Returns: Downloadable file
-
-### Request/Response Examples
-
-**Translate Text**
-```bash
-curl -X POST http://localhost:8000/translate-text \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Hello world", "source_lang": "en", "target_lang": "gu"}'
-```
-
-**OCR + Translate Image**
-```bash
-curl -X POST http://localhost:8000/translate-image \
-  -F "file=@image.jpg" \
-  -F "target_lang=gu" \
-  -F "ocr_engine=easyocr"
-```
-
-**Transcribe Audio**
-```bash
-curl -X POST http://localhost:8000/transcribe-audio \
-  -F "file=@audio.mp3"
-```
-
-**Export PDF**
-```bash
-curl -X POST http://localhost:8000/export \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Content here", "language": "gu", "format": "pdf"}' \
-  --output result.pdf
-```
-
----
-
-## Usage
-
-### Using the Web Interface
-
-1. **Text Tab**: Paste or type text, select translation languages, and translate
-2. **Image Tab**: Upload an image, select OCR engine and target language
-3. **Audio Tab**: Record or upload audio for transcription
-4. **Export**: Download results as PDF or TXT files
-
-### Using the API Directly
-
-The API is fully RESTful and can be integrated into any application:
-
-```python
-import requests
-
-# Translate text
-response = requests.post('http://localhost:8000/translate-text', json={
-    'text': 'Hello',
-    'source_lang': 'en',
-    'target_lang': 'gu'
-})
-print(response.json())
-```
-
----
-
-## Configuration
-
-### Supported Languages
-- **English** (en)
-- **Hindi** (hi)
-- **Gujarati** (gu)
-
-To add more languages:
-1. Update OCR engine initialization in `advanced_ocr_api.py`
-2. Add language codes to EasyOCR/PaddleOCR readers
-3. Restart the application
-
-### OCR Engines
-All three engines are available by default:
-- **EasyOCR**: Fast, accurate, supports 80+ languages
-- **PaddleOCR**: Lightweight, good for detection and recognition
-- **Tesseract**: Classic, reliable, requires system installation
-
-Select engine via the frontend or `ocr_engine` parameter in API calls.
-
-### Environment Variables
-```bash
-PYTHONUNBUFFERED=1
-EASYOCR_MODULE_PATH=/path/to/models
-```
-
----
-
-## Requirements
-
-### System Dependencies (Docker)
-- Python 3.10
-- FFmpeg (audio processing)
-- Tesseract (OCR)
-- OpenGL libraries
-- Fonts (DejaVu, Indic)
-
-### Python Packages
-See `requirements_advanced_ocr.txt` for complete list. Key packages:
-- fastapi >= 0.109.0
-- easyocr >= 1.7.1
-- paddleocr >= 2.7.3
-- faster-whisper >= 1.1.0
-- gTTS >= 2.5.1
-- reportlab >= 4.0.9
-
----
+The web UI is served from `static/index.html` by the same API service.
 
 ## Project Structure
 
-```
+```text
 .
-├── advanced_ocr_api.py           # Main FastAPI application
-├── requirements_advanced_ocr.txt # Python dependencies
-├── Dockerfile                     # Docker configuration
-├── docker-compose.yml             # Docker Compose setup
-├── README.md                      # This file
-├── static/
-│   └── index.html                 # Frontend SPA
-└── temp/                          # Temporary files (audio, exports)
+├── advanced_ocr_api.py             # FastAPI app + OCR/STT/TTS logic
+├── static/index.html               # Frontend UI
+├── requirements_advanced_ocr.txt   # Python dependencies
+├── Dockerfile
+├── docker-compose.yml
+└── .env.example
 ```
 
----
+## Features
 
-## Deployment
+- OCR engines: `easyocr`, `paddleocr`, `tesseract`, and `auto` selection
+- Translation via `googletrans`
+- Speech-to-Text via `faster-whisper`
+- Text-to-Speech via `gTTS`
+- Export as `pdf` or `txt`
+- CORS enabled (`*`) for development/integration
 
-### Local Development
+## Requirements
+
+### System packages (for local non-Docker run)
+
+Install at least:
+- `ffmpeg`
+- `tesseract-ocr`
+- language packs used by Tesseract (`eng`, `hin`, `guj`)
+- OpenCV runtime libs (`libgl1`, `libglib2.0-0` on Debian/Ubuntu)
+
+Docker image already installs required OS packages.
+
+### Python
+
+- Python `3.10`
+- Install dependencies:
+
 ```bash
-python advanced_ocr_api.py
+pip install -r requirements_advanced_ocr.txt
 ```
-Server runs on `http://localhost:8000`
 
-### Docker Compose (Local)
+## Run
+
+### Option 1: Docker Compose (recommended)
+
 ```bash
 docker compose up --build
 ```
-Server runs on `http://localhost:8001` (as configured in docker-compose.yml)
 
-### Railway (Recommended for Production)
-One-click deployment to [Railway.app](https://railway.app):
+Service will be available at:
+- UI: `http://localhost:8001/`
+- Swagger docs: `http://localhost:8001/docs`
+- API info: `http://localhost:8001/api-info`
 
-1. Push code to GitHub
-2. Go to [railway.app](https://railway.app) and sign in
-3. Click "New Project" → "Deploy from GitHub"
-4. Select your repository
-5. Railway auto-detects and deploys! 🚀
+### Option 2: Local Python
 
-**Configuration:**
-- Railway automatically sets the `PORT` variable
-- First deployment takes 5-10 minutes (downloading ML models)
-- See [DEPLOYMENT_RAILWAY.md](DEPLOYMENT_RAILWAY.md) for detailed instructions
-
-**Costs:**
-- Free: $5/month credit (usually sufficient)
-- Paid: Pay-as-you-go pricing
-
-### Custom Port (Local)
 ```bash
-uvicorn advanced_ocr_api:app --host 0.0.0.0 --port 8080
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements_advanced_ocr.txt
+python advanced_ocr_api.py
 ```
 
-### Connecting Remote UI
-If running API on a different host:
+Service will be available at:
+- UI: `http://localhost:8000/`
+- Swagger docs: `http://localhost:8000/docs`
+
+## API Endpoints
+
+### Health / metadata
+
+- `GET /` - Serves UI (`static/index.html`)
+- `GET /api-info` - API metadata and endpoint list
+- `GET /available-engines` - Installed OCR engines and recommendations
+
+### Translation
+
+- `POST /translate-text?target_lang=gu`
+  - JSON body: `{ "text": "..." }`
+- `POST /translate-image?ocr_engine=auto&target_lang=gu`
+  - multipart form-data: `file=<image>`
+- `POST /translate`
+  - Unified endpoint accepting either:
+    - form `text=...`
+    - or form `file=<image>`
+
+### Audio
+
+- `POST /transcribe-audio`
+  - multipart form-data:
+    - `file=<audio>`
+    - optional `language=<lang_code>`
+- `GET /audio/{audio_id}?text=...&lang=gu`
+  - Generates/serves MP3 for given text
+
+### Export
+
+- `POST /export`
+  - multipart form-data fields:
+    - `original_text`
+    - `translated_text`
+    - `src_lang`
+    - `dest_lang`
+    - `format` = `pdf` or `txt`
+
+## cURL Examples
+
+### Translate text
+
+```bash
+curl -X POST "http://localhost:8000/translate-text?target_lang=gu" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Hello world"}'
 ```
-http://<api-host>:<api-port>/?api=http://<api-host>:<api-port>
+
+### OCR + translate image
+
+```bash
+curl -X POST "http://localhost:8000/translate-image?ocr_engine=easyocr&target_lang=gu" \
+  -F "file=@sample.jpg"
 ```
 
----
+### Transcribe audio
 
-## Troubleshooting
+```bash
+curl -X POST "http://localhost:8000/transcribe-audio" \
+  -F "file=@sample.wav" \
+  -F "language=en"
+```
 
-### Issue: OCR engine not initializing
-- Ensure required Python packages are installed
-- Check Docker build includes system dependencies
-- Review logs for specific import errors
+### Export PDF
 
-### Issue: Audio transcription fails
-- Verify FFmpeg is installed: `ffmpeg -version`
-- Check audio file format is supported (MP3, WAV, M4A)
-- Increase timeout for large files
+```bash
+curl -X POST "http://localhost:8000/export" \
+  -F "original_text=hello" \
+  -F "translated_text=હેલો" \
+  -F "src_lang=en" \
+  -F "dest_lang=gu" \
+  -F "format=pdf" \
+  --output translation.pdf
+```
 
-### Issue: Translation accuracy is low
-- Verify source language detection
-- Try a different OCR engine for images
-- Check image quality for OCR tasks
+## Environment Variables
 
-### Issue: Docker build fails
-- Clear Docker cache: `docker system prune`
-- Rebuild with verbose output: `docker compose up --build --verbose`
-- Check available disk space
+Common variables used by this app:
+- `PORT` (default: `8000`)
+- `EASYOCR_MODULE_PATH` (default in Docker: `/root/.EasyOCR`)
+- `WHISPER_MODEL` (default: `base`)
+- `WHISPER_DEVICE` (default: `cpu`)
+- `WHISPER_COMPUTE_TYPE` (default: `int8`)
 
-### Port Already in Use
-- Change port in `docker-compose.yml` for Docker
-- Use `--port` flag for local Python execution
+## Notes / Limitations
 
----
-
-## Performance Tips
-
-1. **Use EasyOCR** for accuracy, **PaddleOCR** for speed
-2. **Compress images** before upload for faster processing
-3. **GPU Support**: Install CUDA-compatible versions of PyTorch for acceleration
-4. **Caching**: Remove old files from `temp/` directory periodically
-
----
-
-## License
-
-[Specify your license here - e.g., MIT, Apache 2.0, etc.]
-
-## Contributing
-
-Contributions welcome! Please submit issues and pull requests.
-
-## Support
-
-For issues, questions, or contributions, please open an issue in the repository.
-
+- First run can be slower due to model downloads (EasyOCR / Whisper).
+- `googletrans` depends on Google Translate web behavior and may fail intermittently.
+- PDF export uses ReportLab default fonts; Gujarati/Hindi rendering in PDFs can be limited without custom Unicode font registration.
+- Generated audio/transient files are stored under `temp/`.
